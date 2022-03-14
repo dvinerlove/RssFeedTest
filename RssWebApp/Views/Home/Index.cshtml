@@ -1,0 +1,77 @@
+﻿@using ClassLibrary.Models
+@using RssWebApp.Models
+@model IndexViewModel
+
+@{
+	ViewData["Title"] = "Home Page";
+}
+<style>
+	img {
+    vertical-align: middle;
+	width:400px; 
+}
+</style>
+<h1>Список</h1>
+<form method="get">
+	<div class="form-inline">
+		<label>Имя: </label>
+		<input name="name" value="@Model.FilterViewModel.SelectedName" class="form-control" />
+
+
+		<input type="submit" value="Фильтр" class="btn btn-outline-dark" />
+	</div>
+</form>
+
+<table style="margin-top: 20px" class="table">
+	@if (Model.PageViewModel.HasPreviousPage)
+{
+	<a asp-action="Index"
+   asp-route-page="@(Model.PageViewModel.PageNumber - 1)"
+   asp-route-name="@(Model.FilterViewModel.SelectedName)"
+   class="btn  btn-outline-dark">
+		<i class="glyphicon glyphicon-chevron-left"></i>
+		Назад
+	</a>
+}
+@if (Model.PageViewModel.HasNextPage)
+{
+	<a asp-action="Index"
+   asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
+   asp-route-name="@(Model.FilterViewModel.SelectedName)"
+   asp-route-sortorder="@(Model.SortViewModel.Current)"
+   class="btn btn-outline-dark">
+		Вперед
+		<i class="glyphicon glyphicon-chevron-right"></i>
+	</a>
+}
+	<tr>
+		<th>
+			Источник
+		</th>
+		<th>
+			<a asp-action="Index"
+			   asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
+			   asp-route-name="@(Model.FilterViewModel.SelectedName)">Название</a>
+		</th>
+		<th>
+			Описание
+		</th>
+		<th>
+			Дата публикации
+		</th>
+	</tr>
+	@foreach (var u in Model.Feed)
+	{
+		<tr>
+			<td>@u.Source</td>
+
+			<td>
+				<a href="@u.Link">
+					@u.Title
+				</a>
+			</td>
+			<td>@Html.Raw(@u.Description )</td>
+			<td>@u.PublishDate.ToShortDateString()<br>@u.PublishDate.ToShortTimeString()</td>
+		</tr>
+	}
+</table>
