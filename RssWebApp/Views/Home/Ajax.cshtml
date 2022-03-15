@@ -1,4 +1,7 @@
-﻿<style>
+﻿@{
+	ViewData["Title"] = "Ajax Page";
+}
+<style>
 	img {
 		vertical-align: middle;
 		width: 400px;
@@ -10,41 +13,60 @@
 	}
 </style>
 
-<h1>Список</h1>
-
-<a class="btn btn-outline-dark prev">
-	Назад
-</a>
-
-<a class="btn btn-outline-dark next">
-	Вперед
-</a>
-
-<table>
+<h1>AJAX Rss</h1>
 	
-</table>
+	<div class="form-inline">
+		<label>Заголовок: </label>
+		<input class="form-control title" id="title" />
+		<label>Источник: </label>
+		<select class="form-control source" >
+			  <option value="">Все</option>
+			  <option value="Интерфакс">Интерфакс</option>
+			  <option value="Хабрахабр">Хабрахабр</option>
+		</select>
+
+		<a   class="btn btn-outline-dark submit" >Фильтр</a>
+	</div>
+	<a class="btn btn-outline-dark prev">
+			Назад
+		</a>
+		<a class="btn btn-outline-dark next">
+			Вперед
+		</a>
+
 <table style="margin-top: 20px" class="table">
 	<tr>
-		<th>Источник</th>
-		<th>Название</th>
+		<th><a href="#" class="source">Источник</a></th>
+		<th><a href="#" class="title">Название</a></th>
 		<th>Описание</th>
-		<th>Дата публикации</th>
+		<th><a href="#" class="date">Дата публикации</a></th>
 	</tr>
 	<tbody class="tblCustomers">
 
 	</tbody>
 </table>
 
-
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 <script type="text/javascript">
 	var currentPage =0;
+	var currentSource ='';
+	var currentTitle ='';
 	var maxPages=1;
-	function multiply(page,title,source) {
+	
+	const dateAsc =2;
+	const dateDesc =3;
+	const nameAsc =1;
+	const nameDesc =2;
+	const sourceAsc =4;
+	const sourceDesc =5;
+
+	var currentSort = dateDesc;
+
+	function getData() {
 	  $.ajax({
 			type: "POST",
 			url: "@Url.Action("GetData")",
-			data: {page: page, title: title,source: source},
+			data: {page: currentPage, title: currentTitle,source: currentSource,sortOrder: currentSort},
 			dataType: "text",
 			success: function (msg) {
 				var rows = '';
@@ -61,7 +83,6 @@
 						var title = json[index].title;
 						rows += "<tr><td>" + source + "</td><td>" +
 						"<a href="+link+">"+title+"</a>"+"</td><td>" +description+ "</td><td>" + date.toLocaleDateString()+"<br>"+date.toLocaleTimeString() + "</td></tr>";
-						count++;
 						});
 				$("tbody.tblCustomers tr").remove();
 				$('tbody.tblCustomers').append(rows);
@@ -71,31 +92,34 @@
 			}
 		});
 	}
+		
+	$("a.btn.btn-outline-dark.submit").click(function(){
+		currentSource = $("select.form-control.source").val();
+		currentTitle = $("input.form-control.title").val();
+			getData();
+	});
 
 	$("a.btn.btn-outline-dark.prev").click(function(){
-		console.log("prev");
-		console.log(currentPage);
 		if(currentPage>0)
 		{
 			currentPage--;
-			multiply(currentPage,'','');
+			getData();
 		}	
 	});
-
+	
 	$("a.btn.btn-outline-dark.next").click(function(){
-				console.log("next");
-		console.log(currentPage);
-
 		 $.ajax({
-			type: "GET",
+			type: "POST",
+			data: {title: currentTitle,source: currentSource},
 			url: "@Url.Action("GetPagesCount")",
 			dataType: "text",
 			success: function (msg) {
 				var count = 0;
 					count=msg;
-					if(currentPage<msg){
+					
+					if(currentPage<(msg-1)){
 						currentPage++;
-						multiply(currentPage,'','');
+						getData();
 					}
 			},
 			error: function (req, status, error) {
@@ -104,7 +128,37 @@
 		});
 	});
 
+	$("a.date").click(function(){
+		if(currentSort == dateDesc)
+		{
+			currentSort = dateAsc;
+		}else{
+			currentSort = dateDesc;
+		}
+		getData();
+	});
+	
+	$("a.source").click(function(){
+		if(currentSort == sourceDesc)
+		{
+			currentSort = sourceAsc;
+		}else{
+			currentSort = sourceDesc;
+		}
+		getData();
+	});
+	
+	$("a.title").click(function(){
+		if(currentSort == nameDesc)
+		{
+			currentSort = nameAsc;
+		}else{
+			currentSort = nameDesc;
+		}
+		getData();
+	});
+
 	$(document).ready(function () {
-		multiply(currentPage,'','');
+		getData();
 	});
 </script>
