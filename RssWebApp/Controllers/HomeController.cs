@@ -28,11 +28,11 @@ namespace RssWebApp.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public IActionResult Index(string? name, string? source, int page = 0,
+        public IActionResult Index(string name, string source, int page = 0,
                  SortState sortOrder = SortState.DateDesc)
         {
-             var list = GetData(name??"", source??"", page, sortOrder);
-            var count = GetPagesCount(name ?? "", source ?? "");
+            var list = GetData(name, source, page, sortOrder);
+            var count = GetPagesCount(name, source);
 
             IndexViewModel viewModel = new IndexViewModel
             {
@@ -42,7 +42,6 @@ namespace RssWebApp.Controllers
                 Feed = list
             };
             return View(viewModel);
-
         }
 
         [HttpPost]
