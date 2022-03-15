@@ -41,8 +41,8 @@ namespace RssWebApp.Models
     public class SortViewModel
     {
         public SortState NameSort { get; private set; }
-        public SortState DateSort { get; private set; }  
-        public SortState SourceSort { get; private set; } 
+        public SortState DateSort { get; private set; }
+        public SortState SourceSort { get; private set; }
         public SortState Current { get; private set; }
 
         public SortViewModel(SortState sortOrder)
@@ -64,13 +64,15 @@ namespace RssWebApp.Models
     }
     public class FilterViewModel
     {
-        public FilterViewModel(List<News> companies, string title)
+        public FilterViewModel(List<News> feed, string title, string? source)
         {
-            Companies = new SelectList(companies, "Id", "Name", title);
+            Feed = new SelectList(feed, "Id", "Name", title);
             SelectedName = title;
+            SelectedSource = source??"";
         }
-        public SelectList Companies { get; private set; } 
-        public string SelectedName { get; private set; } 
+        public SelectList Feed { get; private set; }
+        public string SelectedName { get; private set; }
+        public string SelectedSource { get; private set; }
     }
 
 }

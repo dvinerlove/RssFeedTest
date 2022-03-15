@@ -10,17 +10,28 @@
     vertical-align: middle;
 	width:400px; 
 }
+	input.btn.btn-outline-dark,a.btn.btn-outline-dark {
+    margin-right: 20px;
+    margin-top: 20px;
+}
 </style>
+
 <h1>Список</h1>
+
 <form method="get">
 	<div class="form-inline">
-		<label>Имя: </label>
+		<label>Заголовок: </label>
 		<input name="name" value="@Model.FilterViewModel.SelectedName" class="form-control" />
-
-
+		<label>Источник: </label>
+		<select name="source" value="@Model.FilterViewModel.SelectedSource" class="form-control">
+			  <option value="">Все</option>
+			  <option value="Интерфакс">Интерфакс</option>
+			  <option value="Хабрахабр">Хабрахабр</option>
+		</select>
 		<input type="submit" value="Фильтр" class="btn btn-outline-dark" />
 	</div>
 </form>
+
 
 <table style="margin-top: 20px" class="table">
 	@if (Model.PageViewModel.HasPreviousPage)
@@ -29,7 +40,6 @@
    asp-route-page="@(Model.PageViewModel.PageNumber - 1)"
    asp-route-name="@(Model.FilterViewModel.SelectedName)"
    class="btn  btn-outline-dark">
-		<i class="glyphicon glyphicon-chevron-left"></i>
 		Назад
 	</a>
 }
@@ -41,12 +51,13 @@
    asp-route-sortorder="@(Model.SortViewModel.Current)"
    class="btn btn-outline-dark">
 		Вперед
-		<i class="glyphicon glyphicon-chevron-right"></i>
 	</a>
 }
 	<tr>
 		<th>
-			Источник
+			<a asp-action="Index"
+			   asp-route-sortOrder="@(Model.SortViewModel.SourceSort)"
+			   asp-route-name="@(Model.FilterViewModel.SelectedName)">Источник</a>
 		</th>
 		<th>
 			<a asp-action="Index"
@@ -57,14 +68,16 @@
 			Описание
 		</th>
 		<th>
-			Дата публикации
+			<a asp-action="Index"
+			   asp-route-sortOrder="@(Model.SortViewModel.DateSort)"
+			   asp-route-name="@(Model.FilterViewModel.SelectedName)">Дата публикации</a>
 		</th>
 	</tr>
+
 	@foreach (var u in Model.Feed)
 	{
 		<tr>
 			<td>@u.Source</td>
-
 			<td>
 				<a href="@u.Link">
 					@u.Title
@@ -74,4 +87,5 @@
 			<td>@u.PublishDate.ToShortDateString()<br>@u.PublishDate.ToShortTimeString()</td>
 		</tr>
 	}
+
 </table>

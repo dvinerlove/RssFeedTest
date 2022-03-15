@@ -1,0 +1,110 @@
+﻿<style>
+	img {
+		vertical-align: middle;
+		width: 400px;
+	}
+
+	input.btn.btn-outline-dark, a.btn.btn-outline-dark {
+		margin-right: 20px;
+		margin-top: 20px;
+	}
+</style>
+
+<h1>Список</h1>
+
+<a class="btn btn-outline-dark prev">
+	Назад
+</a>
+
+<a class="btn btn-outline-dark next">
+	Вперед
+</a>
+
+<table>
+	
+</table>
+<table style="margin-top: 20px" class="table">
+	<tr>
+		<th>Источник</th>
+		<th>Название</th>
+		<th>Описание</th>
+		<th>Дата публикации</th>
+	</tr>
+	<tbody class="tblCustomers">
+
+	</tbody>
+</table>
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+	var currentPage =0;
+	var maxPages=1;
+	function multiply(page,title,source) {
+	  $.ajax({
+			type: "POST",
+			url: "@Url.Action("GetData")",
+			data: {page: page, title: title,source: source},
+			dataType: "text",
+			success: function (msg) {
+				var rows = '';
+				var count = 0;
+					var json = JSON.parse(msg);
+
+					$(json).each(function (index, item) {
+						var publishDate = json[index].publishDate;
+						var date = new Date(publishDate);
+						 
+						var link = json[index].link;
+						var description = json[index].description;
+						var source = json[index].source;
+						var title = json[index].title;
+						rows += "<tr><td>" + source + "</td><td>" +
+						"<a href="+link+">"+title+"</a>"+"</td><td>" +description+ "</td><td>" + date.toLocaleDateString()+"<br>"+date.toLocaleTimeString() + "</td></tr>";
+						count++;
+						});
+				$("tbody.tblCustomers tr").remove();
+				$('tbody.tblCustomers').append(rows);
+			},
+			error: function (req, status, error) {
+				console.log(msg);
+			}
+		});
+	}
+
+	$("a.btn.btn-outline-dark.prev").click(function(){
+		console.log("prev");
+		console.log(currentPage);
+		if(currentPage>0)
+		{
+			currentPage--;
+			multiply(currentPage,'','');
+		}	
+	});
+
+	$("a.btn.btn-outline-dark.next").click(function(){
+				console.log("next");
+		console.log(currentPage);
+
+		 $.ajax({
+			type: "GET",
+			url: "@Url.Action("GetPagesCount")",
+			dataType: "text",
+			success: function (msg) {
+				var count = 0;
+					count=msg;
+					if(currentPage<msg){
+						currentPage++;
+						multiply(currentPage,'','');
+					}
+			},
+			error: function (req, status, error) {
+				console.log(msg);
+			}
+		});
+	});
+
+	$(document).ready(function () {
+		multiply(currentPage,'','');
+	});
+</script>
